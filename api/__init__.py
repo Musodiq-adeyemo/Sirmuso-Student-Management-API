@@ -8,6 +8,7 @@ from .teacher_course.views import teachercourse_namespace
 from .auth.views import auth_namespace
 from .config.config import config_dict
 from .profile.views import profile_namespace
+from dotenv import load_dotenv
 from .utils import db
 from http import HTTPStatus
 from flask_migrate import Migrate
@@ -23,7 +24,7 @@ from werkzeug.exceptions import NotFound,MethodNotAllowed
 
 def create_app(config=config_dict['dev']):
     app = Flask(__name__)
-
+    load_dotenv()
     app.config.from_object(config)
 
     jwt = JWTManager(app)
