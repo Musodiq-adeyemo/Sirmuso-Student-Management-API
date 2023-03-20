@@ -89,6 +89,6 @@ class TeacherTestCase(unittest.TestCase):
             'Authorization':f"Bearer {token}"
         }
 
-        response = self.client.post('/Teacher/teachers/1',headers =headers)
+        response = self.client.get('/Teacher/teachers/1',headers =headers)
 
         assert response.status_code == 200

@@ -56,7 +56,7 @@ class StudentTestCase(unittest.TestCase):
 
         response = self.client.post('/student/students',json=data,headers =headers)
 
-        assert response.status_code == 200
+        assert response.status_code == 201
 
         students = Student.query.all()
 
@@ -71,7 +71,7 @@ class StudentTestCase(unittest.TestCase):
         assert response.json['firstname']== 'Muso'
 
 
-    def test_get_teacher_by_id(self):
+    def test_get_student_by_id(self):
         student = Student(
             lastname='Ade',
             firstname='Muso',
@@ -89,6 +89,6 @@ class StudentTestCase(unittest.TestCase):
             'Authorization':f"Bearer {token}"
         }
 
-        response = self.client.post('/student/students/1',headers =headers)
+        response = self.client.get('/student/students/1',headers =headers)
 
         assert response.status_code == 200

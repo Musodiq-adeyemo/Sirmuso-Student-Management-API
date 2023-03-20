@@ -57,7 +57,7 @@ class ProfileTestCase(unittest.TestCase):
 
         response = self.client.post('/profile/settings',json=data,headers =headers)
 
-        assert response.status_code == 200
+        assert response.status_code == 201
 
         profiles = Profile.query.all()
 
@@ -91,6 +91,6 @@ class ProfileTestCase(unittest.TestCase):
             'Authorization':f"Bearer {token}"
         }
 
-        response = self.client.post('/profile/settings/1',headers =headers)
+        response = self.client.get('/profile/settings/1',headers =headers)
 
         assert response.status_code == 200

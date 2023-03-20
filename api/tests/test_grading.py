@@ -7,7 +7,7 @@ from flask_jwt_extended import create_access_token,create_refresh_token
 from flask_jwt_extended import jwt_required,get_jwt_identity,unset_jwt_cookies
 
 
-class StudentCourseTestCase(unittest.TestCase):
+class StudentGradeTestCase(unittest.TestCase):
     def setUp(self):
         self.app = create_app(config=config_dict['test'])
 
@@ -99,6 +99,6 @@ class StudentCourseTestCase(unittest.TestCase):
             'Authorization':f"Bearer {token}"
         }
 
-        response = self.client.post('Grade/grade/1',headers =headers)
+        response = self.client.get('Grade/grade/1',headers =headers)
 
         assert response.status_code == 200
