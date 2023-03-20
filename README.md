@@ -1,4 +1,4 @@
-# ALTSCHOOL-BACKEND-Python-SECOND-SEMESTER-EXAMINATION-PROJECT.
+# ALTSCHOOL-BACKEND-Python-THIRD-SEMESTER-EXAMINATION-PROJECT.
 ## CONTENT
 ### Title
 ### Introduction 
@@ -108,16 +108,16 @@ Submit the student's score for grading and their scores can be retrieved, update
 
 
 ## Admin Authorized routes
-All routes in the Auth namespace.
-All routes in the Profile namespace.
-All routes in the Grade namespace.
-All routes except Get matric_no routes in the Student namespace.
-All routes except Get staff Id routes in the Teacher namespace.
-Get all courses route
-Get courses by course id route.
-Get all teacher courses route.
-Get teacher courses by course id route.
-All other routes are unauthorized for the admin.
+### All routes in the Auth namespace.
+### All routes in the Profile namespace.
+### All routes in the Grade namespace.
+### All routes except Get matric_no routes in the Student namespace.
+### All routes except Get staff Id routes in the Teacher namespace.
+### Get all courses route
+### Get courses by course id route.
+### Get all teacher courses route.
+### Get teacher courses by course id route.
+### All other routes are unauthorized for the admin.
 
 ## Teacher
 ### Step 1 :
@@ -132,11 +132,11 @@ Register for the course you are to teach for the semester and you can also updat
 Submit the student's score for your course for grading you can as well retrieve, update and delete student scores.
 
 ## Teacher authorized routes
-All routes in the Auth namespace.
-All routes in the profile namespace.
-All routes in the TeacherCourse namespace.
-All routes in the Grade namespace.
-Get staff id route.
+### All routes in the Auth namespace.
+### All routes in the profile namespace.
+### All routes in the TeacherCourse namespace.
+### All routes in the Grade namespace.
+### Get staff id route.
 ## Student
 ### Step 1 :
 Create an account with your email , username , password and specify your role(i.e designation= ADMIN).
@@ -148,11 +148,11 @@ Get your matriculation number from the Get matrix_no  route in the Student names
 Register for the courses you are to take for the semester and you can also update, delete and retrieve the courses.
 
 ## Student authorized routes
-All routes in the Auth namespace.
-All routes in the profile namespace.
-All routes in the StudentCourse namespace.
-All routes in the Grade namespace except the Submit result route.
-Get matric_no route.
+### All routes in the Auth namespace.
+### All routes in the profile namespace.
+### All routes in the StudentCourse namespace.
+### All routes in the Grade namespace except the Submit result route.
+### Get matric_no route.
 
 # LESSON LEARNED 
 ### Unit testing using pytest and test environment variables.
@@ -163,7 +163,7 @@ Get matric_no route.
 
 #  TESTING
 To test Sirmuso Student Management API you must follow the above rules and guidelines while working through the below site.
-Click the deploy link musawdeeq.pythonanywhere.com 
+Click the deploy link # musawdeeq.pythonanywhere.com 
 
 
 # THE Challenges’
