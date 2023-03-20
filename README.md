@@ -163,7 +163,7 @@ Register for the courses you are to take for the semester and you can also updat
 
 #  TESTING
 To test Sirmuso Student Management API you must follow the above rules and guidelines while working through the below site.
-Click the deploy link musawdeeq.pythonanywhere.com 
+Click the deploy link # musawdeeq.pythonanywhere.com 
 
 
 # THE Challenges’
