@@ -29,8 +29,13 @@ display_student = student_namespace.model(
 )
 
 
+<<<<<<< HEAD
 student_matricNo = student_namespace.model(
     'StudentMatricNO', {
+=======
+matricNo = student_namespace.model(
+    'Matric', {
+>>>>>>> e1e8c965db80292e5c4638b005e67ab20d97152d
        'student_id':fields.Integer(description='Student  ID',required = True),
        'email':fields.String(description='Student Email',required = True),
        'user_id':fields.Integer(description='Student ID',required = True),
@@ -223,7 +228,7 @@ class GetStudentC(Resource):
 
 @student_namespace.route('/students/matric')
 class GetMatricNo(Resource):
-    @student_namespace.expect(student_matricNo)
+    @student_namespace.expect(matricNo)
     @student_namespace.marshal_with(show_matricNo)
     @student_namespace.doc(description='Generate student matric number')
     @jwt_required()

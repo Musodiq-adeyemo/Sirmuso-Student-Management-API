@@ -40,8 +40,11 @@ class StudentTestCase(unittest.TestCase):
 
         assert response.json == []
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> e1e8c965db80292e5c4638b005e67ab20d97152d
     def test_get_student_by_id(self):
         student = Student(
             lastname='Ade',
