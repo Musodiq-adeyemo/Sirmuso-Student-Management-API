@@ -1,4 +1,4 @@
-from flask_restx import Namespace,Resource,fields
+from flask_restx import Namespace,Resource,fields,abort
 from ..models.student_course import StudentCourse
 from ..models.users import User
 from api.relationship import display_student
@@ -71,29 +71,23 @@ class RegisterGetCourse(Resource):
         Register Course(Student)
         """
         data = course_namespace.payload
-        email = get_jwt_identity()
-        users = User.query.all()
-        for user in users :
-            if user.email == email and user.designation.upper() == 'STUDENT':
-                new_course = StudentCourse(
-                course_id = data['course_id'],
-                student_id = data['student_id'],
-                email = data['email'],
-                level = data['level'],
-                matric_no = data['matric_no'],
+        user_id = get_jwt_identity()
 
-                )
-                new_course.save()
-                
-                return new_course, HTTPStatus.CREATED
+        user = User.get_by_id(user_id)
+        if user.designation.upper() != "STUDENT":
+            abort(401,desription='You are not authorized to perform this operation.Student only.')
+        new_course = StudentCourse(
+        course_id = data['course_id'],
+        student_id = data['student_id'],
+        email = data['email'],
+        level = data['level'],
+        matric_no = data['matric_no'],
 
+        )
+        new_course.save()
+        
+        return new_course, HTTPStatus.CREATED
 
-            else:
-                response_object = {
-                    'status':'fail',
-                    'message':'You are not authorized to perform this operation.Admin only.'
-                }
-                return response_object
         
 @course_namespace.route('/course/<int:id>')
 class GetUpdateDelete(Resource):
@@ -124,26 +118,20 @@ class GetUpdateDelete(Resource):
         
         data = course_namespace.payload
 
-        email = get_jwt_identity()
-        users = User.query.all()
-        for user in users :
-            if user.email == email and user.designation.upper() == 'STUDENT':
-                course_update.course_id = data['course_id'],
-                course_update.student_id = data['student_id'],
-                course_update.email = data['email'],
-                course_update.level = data['level'],
-                course_update.matric_no = data['matric_no'],
-                course_update.update()
-                
-                return course_update,HTTPStatus.OK
+        user_id = get_jwt_identity()
 
-            else:
-                response_object = {
-                    'status':'fail',
-                    'message':'You are not authorized to perform this operation.Admin only.'
-                }
-                return response_object
+        user = User.get_by_id(user_id)
+        if user.designation.upper() != "STUDENT":
+            abort(401,desription='You are not authorized to perform this operation.Student only.')
+        course_update.course_id = data['course_id'],
+        course_update.student_id = data['student_id'],
+        course_update.email = data['email'],
+        course_update.level = data['level'],
+        course_update.matric_no = data['matric_no'],
+        course_update.update()
         
+        return course_update,HTTPStatus.OK
+
         
     
     @course_namespace.doc(description='Delete Course')
@@ -154,22 +142,16 @@ class GetUpdateDelete(Resource):
         """
         course_delete = StudentCourse.get_by_id(id)
 
-        email = get_jwt_identity()
-        users = User.query.all()
-        for user in users :
-            if user.email == email and user.designation.upper() == 'STUDENT':
-                course_delete.delete()
+        user_id = get_jwt_identity()
 
-                return {"message":f"Course with id {id} Delected Successfully"},HTTPStatus.OK
+        user = User.get_by_id(user_id)
+        if user.designation.upper() != "STUDENT":
+            abort(401,desription='You are not authorized to perform this operation.Student only.')
+        course_delete.delete()
 
-            else:
-                response_object = {
-                    'status':'fail',
-                    'message':'You are not authorized to perform this operation.Admin only.'
-                }
-                return response_object
+        return {"message":f"Course with id {id} Delected Successfully"},HTTPStatus.OK
 
-        
+
 
 @course_namespace.route('/course/students/<int:course_id>')
 class GetCourses(Resource):

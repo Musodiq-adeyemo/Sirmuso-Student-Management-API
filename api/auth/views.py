@@ -1,4 +1,4 @@
-from flask_restx import Namespace,Resource,fields,Api
+from flask_restx import Namespace,Resource,fields,abort
 from flask import request
 from ..utils import db
 from ..models.users import User
@@ -8,13 +8,13 @@ from flask_jwt_extended import create_access_token,create_refresh_token
 from flask_jwt_extended import jwt_required,get_jwt_identity,unset_jwt_cookies
 
 auth_namespace = Namespace("Auth",description="Namespace for authentication")
-root_api = Api()
+
 signup_model= auth_namespace.model(
     "signup", {
         'username':fields.String(required=True,description='A username'),
         'email':fields.String(required=True,description='An email'),
         'password':fields.String(required=True,description='A password'),
-        'designation': fields.String(description='User Role',required = True,enum=['STUDENT','STAFF','ADMIN']),
+        'designation': fields.String(description='User Role',required = True),
     }
 )
 
@@ -52,34 +52,7 @@ class SignUp(Resource):
         Users Registration
         """
         data = request.get_json()
-        """
-        username=data.get('username'),
-        email = data.get('email'),
-        password = (data.get('password'))
-
-        email_exist = User.query.filter_by(email=email).first()
-        username_exist = User.query.filter_by(username=username).first()
-
-        if email_exist :
-            response_object = {
-                'status':'fail',
-                'message':'Email Already exist please log in or use another email.'
-            }
-            return response_object
-        elif username_exist :
-            response_object = {
-                'status':'fail',
-                'message':'Username Already exist please log in or use another username.'
-            }
-            return response_object
-        elif len(password) < 8 :
-            response_object = {
-                'status':'fail',
-                'message':'Password too short, Please use longer password.'
-            }
-            return response_object
-        else:
-        """
+        
         new_user = User(
             username=data.get('username'),
             email = data.get('email'),
@@ -87,6 +60,7 @@ class SignUp(Resource):
             designation = data.get('designation')
         )
         new_user.save()
+        
         return new_user, HTTPStatus.CREATED
    
     @auth_namespace.marshal_with(show_user)
@@ -162,8 +136,8 @@ class Login(Resource):
 
         user = User.query.filter_by(email=email).first()
         if (user is not None) and check_password_hash(user.password,password):
-            access_token = create_access_token(identity=user.email)
-            refresh_token = create_refresh_token(identity=user.email)
+            access_token = create_access_token(identity=user.id)
+            refresh_token = create_refresh_token(identity=user.id)
 
             response = {
                 "access_token":access_token,
@@ -198,3 +172,14 @@ class Logout(Resource):
         return {"message":"Successfully Logged Out"}, HTTPStatus.OK
     
 
+@auth_namespace.route('/currentuser')
+class CurrentUser(Resource):
+
+    def get_current_user(self):
+        
+        user_id = get_jwt_identity()
+        
+        user = User.query.filter_by(id=user_id).first()
+
+        return user.username, HTTPStatus.OK
+        

@@ -5,7 +5,7 @@ from ..utils import db
 from ..auth.views import show_user
 from ..models.profile import Profile,ProfileImage
 from ..models.users import User
-from flask_jwt_extended import get_jwt_identity,jwt_required
+from flask_jwt_extended import get_jwt_identity,jwt_required,get_current_user
 from werkzeug.utils import secure_filename
 
 profile_namespace = Namespace('Profile',description='Namespace for Profile')
@@ -156,3 +156,4 @@ class ProfilePicture(Resource):
         image_upload = ProfileImage(img = pic.read(),mimetype=mimetype, name=filename,profile = data.get('profile'))
         db.session.add(image_upload)
         db.session.commit()
+

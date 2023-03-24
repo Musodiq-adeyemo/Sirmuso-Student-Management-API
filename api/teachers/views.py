@@ -1,4 +1,4 @@
-from flask_restx import Namespace,Resource,fields
+from flask_restx import Namespace,Resource,fields,abort
 from ..models.teacher import Teacher,StaffID
 from ..models.users import User
 from ..auth.views import show_user
@@ -93,29 +93,26 @@ class RegisterGetTeacher(Resource):
         Register Teacher(Admin)
         """
         data = teacher_namespace.payload
-        email = get_jwt_identity()
-        users = User.query.all()
-        for user in users :
-            if user.email == email and user.designation.upper() == 'ADMIN':
-                new_teacher = Teacher(
-                lastname = data['lastname'],
-                firstname = data['firstname'],
-                othername = data['othername'],
-                email = data['email'],
-                user_id = data['user_id'],
-
-            )
-                new_teacher.save()
-                
-                return new_teacher, HTTPStatus.CREATED
-
-            else:
-                response_object = {
-                    'status':'fail',
-                    'message':'You are not authorized to perform this operation.Admin only.'
-                }
-                return response_object
         
+        user_id = get_jwt_identity()
+
+        user = User.get_by_id(user_id)
+        if user.designation.upper() != "ADMIN":
+            abort(401,desription='You are not authorized to perform this operation.Admin only.') 
+        
+
+        new_teacher = Teacher(
+        lastname = data['lastname'],
+        firstname = data['firstname'],
+        othername = data['othername'],
+        email = data['email'],
+        user_id = data['user_id'],
+        )
+        
+        new_teacher.save()
+        
+        return new_teacher, HTTPStatus.CREATED
+
 
 @teacher_namespace.route('/teachers/<int:teacher_id>')
 class GetUpdateDeleteTeachers(Resource):
@@ -131,6 +128,12 @@ class GetUpdateDeleteTeachers(Resource):
         """
         Get Teacher by ID
         """
+        user_id = get_jwt_identity()
+
+        user = User.get_by_id(user_id)
+        if user.designation.upper() == "STUDENT":
+            abort(401,desription='You are not authorized to perform this operation.Admin & Teacher only.') 
+        
         teacher= Teacher.get_by_id(teacher_id)
 
         return teacher, HTTPStatus.OK
@@ -147,25 +150,22 @@ class GetUpdateDeleteTeachers(Resource):
         
         data = teacher_namespace.payload
 
-        email = get_jwt_identity()
-        users = User.query.all()
-        for user in users :
-            if user.email == email and user.designation.upper() == 'ADMIN':
-                teacher_update.lastname = data['lastname'],
-                teacher_update.firstname = data['firstname'],
-                teacher_update.othername = data['othername'],
-                teacher_update.email = data['email'],
-                teacher_update.user_id = data['user_id'],
-                
-                teacher_update.update()
-                return teacher_update,HTTPStatus.OK
+        user_id = get_jwt_identity()
 
-            else:
-                response_object = {
-                    'status':'fail',
-                    'message':'You are not authorized to perform this operation.Admin only.'
-                }
-                return response_object
+        user = User.get_by_id(user_id)
+        
+        if user.designation.upper() != "ADMIN":
+            abort(401,desription='You are not authorized to perform this operation.Admin only.') 
+        
+        teacher_update.lastname = data['lastname'],
+        teacher_update.firstname = data['firstname'],
+        teacher_update.othername = data['othername'],
+        teacher_update.email = data['email'],
+        teacher_update.user_id = data['user_id'],
+        
+        teacher_update.update()
+        return teacher_update,HTTPStatus.OK
+
             
         
     
@@ -176,23 +176,19 @@ class GetUpdateDeleteTeachers(Resource):
         Delete  Teacher by ID(Admin)
         """
         teacher_delete = Teacher.get_by_id(student_id)
-
-        email = get_jwt_identity()
         
-        users = User.query.all()
-        for user in users :
-            if user.email == email and user.designation.upper() == 'ADMIN':
-                teacher_delete.delete()
+        user_id = get_jwt_identity()
 
-                return {"message":"Teacher Dashboard Delected Successfully"},HTTPStatus.OK
+        user = User.get_by_id(user_id)
+        if user.designation.upper() != "ADMIN":
+            abort(401,desription='You are not authorized to perform this operation.Admin only.') 
+        
+        teacher_delete.delete()
+
+        return {"message":"Teacher Dashboard Delected Successfully"},HTTPStatus.OK
 
 
-            else:
-                response_object = {
-                    'status':'fail',
-                    'message':'You are not authorized to perform this operation.Admin only.'
-                }
-                return response_object
+            
 
         
 @teacher_namespace.route('/teachers/course/<int:teacher_id>')
@@ -228,27 +224,24 @@ class GetStaffId(Resource):
         Generate Staff Identification Number(Admin)
         """
 
-        email = get_jwt_identity()
-        users = User.query.all()
-        for user in users :
-            if user.email == email and user.designation == 'ADMIN':
-                data = teacher_namespace.payload
-                new_staff = StaffID(
-                teacher_id = data['teacher_id'],
-                email = data['email'],
-                staff_id = "ALT/2023/STAFF/" + str(data['teacher_id'])
-            )
-            
-                new_staff.save()
-                
-                return new_staff, HTTPStatus.CREATED
+        user_id = get_jwt_identity()
 
-            else:
-                response_object = {
-                    'status':'fail',
-                    'message':'You are not authorized to perform this operation.Admin only.'
-                }
-                return response_object
+        user = User.get_by_id(user_id)
+        if user.designation.upper() != "ADMIN":
+            abort(401,desription='You are not authorized to perform this operation.Admin only.') 
+        
+        data = teacher_namespace.payload
+        new_staff = StaffID(
+        teacher_id = data['teacher_id'],
+        email = data['email'],
+        staff_id = "ALT/2023/STAFF/" + str(data['teacher_id'])
+        )
+            
+        new_staff.save()
+        
+        return new_staff, HTTPStatus.CREATED
+
+            
         
 @teacher_namespace.route('/teachers/staff_id/<int:user_id>')
 class GetStaffIdNO(Resource):
@@ -265,6 +258,12 @@ class GetStaffIdNO(Resource):
 
         staff_ids = StaffID.query.all()
 
+        user_id = get_jwt_identity()
+
+        user = User.get_by_id(user_id)
+        if user.designation.upper() != "TEACHER":
+            abort(401,desription='You are not authorized to perform this operation.Teacher only.') 
+        
         for staff in staff_ids:
             if staff.user_id == user_id:
 
@@ -289,6 +288,12 @@ class GetTeacherByUserId(Resource):
 
         teachers = Teacher.query.all()
 
+        user_id = get_jwt_identity()
+
+        user = User.get_by_id(user_id)
+        if user.designation.upper() == "STUDENT":
+            abort(401,desription='You are not authorized to perform this operation.Admin & Teacher only.') 
+        
         for teacher in teachers:
             if teacher.user_id == user_id:
 

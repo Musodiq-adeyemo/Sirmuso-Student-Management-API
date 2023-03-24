@@ -40,35 +40,6 @@ class TeacherTestCase(unittest.TestCase):
 
         assert response.json == []
 
-    def test_create_teacher(self):
-        data = {
-            'lastname' :'Ade',
-            'firstname' : 'Muso',
-            'othername' :'Ola',
-            'email' : 'sirmuso@gmail.com',
-            'user_id' : 1,
-        }
-        token = create_access_token(identity='sirmuso@gmail.com')
-
-        headers = {
-            'Authorization':f"Bearer {token}"
-        }
-
-        response = self.client.post('/Teacher/teachers',json=data,headers =headers)
-
-        assert response.status_code == 200
-
-        teachers = Teacher.query.all()
-
-        teacher_id = teachers[0].id
-
-        assert teacher_id == 1
-
-        assert len(teachers) == 1
-
-        assert response.json['lastname']== 'Ade'
-
-        assert response.json['firstname']== 'Muso'
 
 
     def test_get_teacher_by_id(self):

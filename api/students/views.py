@@ -1,11 +1,11 @@
-from flask_restx import Namespace,Resource,fields
+from flask_restx import Namespace,Resource,fields,abort
 from ..models.student import Student,StudentMatricNo
 from ..models.users import User
 from ..teacher_course.views import display_course
 from ..grading.views import display_grade
 from ..auth.views import show_user
 from http import HTTPStatus
-from flask_jwt_extended import jwt_required,get_jwt_identity
+from flask_jwt_extended import jwt_required,get_jwt_identity,get_current_user
 
 student_namespace = Namespace("Student",description="Namespace for Student Registration")
 
@@ -30,7 +30,7 @@ display_student = student_namespace.model(
 
 
 student_matricNo = student_namespace.model(
-    'StudentMatric', {
+    'StudentMatricNO', {
        'student_id':fields.Integer(description='Student  ID',required = True),
        'email':fields.String(description='Student Email',required = True),
        'user_id':fields.Integer(description='Student ID',required = True),
@@ -93,29 +93,23 @@ class RegisterGetStudent(Resource):
         Register Student(Admin)
         """
         data = student_namespace.payload
-        email = get_jwt_identity()
+        user_id = get_jwt_identity()
 
-        users = User.query.all()
-        for user in users :
-            if user.email == email and user.designation.upper() == 'ADMIN':
-                new_student = Student(
-                    lastname = data['lastname'],
-                    firstname = data['firstname'],
-                    othername = data['othername'],
-                    email = data['email'],
-                    user_id = data['user_id'],
-                )
-                
-                new_student.save()
-                
-                return new_student, HTTPStatus.CREATED
-            else:
-                response_object = {
-                    'status':'fail',
-                    'message':'You are not authorized to perform this operation.Admin only.'
-                }
-                return response_object
-
+        user = User.get_by_id(user_id)
+        if user.designation.upper() != "ADMIN":
+            abort(401,desription='You are not authorized to perform this operation.Admin only.') 
+        
+        new_student = Student(
+            lastname = data['lastname'],
+            firstname = data['firstname'],
+            othername = data['othername'],
+            email = data['email'],
+            user_id = data['user_id'],
+        )
+        
+        new_student.save()
+        
+        return new_student, HTTPStatus.CREATED
 @student_namespace.route('/students/<int:student_id>')
 class GetUpdateDeleteStudents(Resource):
     @student_namespace.marshal_with(show_student)
@@ -141,7 +135,13 @@ class GetUpdateDeleteStudents(Resource):
         """
         Update Student Information by ID(Admin)
         """
-        email = get_jwt_identity()
+        user_id = get_jwt_identity()
+
+        user = User.get_by_id(user_id)
+        if user.designation.upper() != "ADMIN":
+            abort(401,desription='You are not authorized to perform this operation.Admin only.') 
+        
+
         student_update = Student.get_by_id(student_id)
         
         data = student_namespace.payload
@@ -152,41 +152,31 @@ class GetUpdateDeleteStudents(Resource):
         student_update.email = data['email'],
         student_update.user_id = data['user_id'],
         
-        users = User.query.all()
-        for user in users :
-            if user.email == email and user.designation.upper() == 'ADMIN':
-                student_update.update()
-                return student_update,HTTPStatus.OK
-            else:
-                response_object = {
-                    'status':'fail',
-                    'message':'You are not authorized to perform this operation.Admin only.'
-                }
-                return response_object
-    
+        student_update.update()
+        return student_update,HTTPStatus.OK
+            
     @student_namespace.doc(description='Delete Student')
     @jwt_required()
     def delete(self,student_id):
         """
         Delete Student by ID(Admin)
         """
-        email = get_jwt_identity()
+
+        user_id = get_jwt_identity()
+
+        user = User.get_by_id(user_id)
+        if user.designation.upper() != "ADMIN":
+            abort(401,desription='You are not authorized to perform this operation.Admin only.') 
+        
+
         student_delete = Student.get_by_id(student_id)
 
-        users = User.query.all()
-        for user in users :
-            if user.email == email and user.designation.upper() == 'ADMIN':
-                student_delete.delete()
+        student_delete.delete()
 
-                return {"message":"Student Dashboard Delected Successfully"},HTTPStatus.OK
+        return {"message":"Student Dashboard Delected Successfully"},HTTPStatus.OK
 
-            else:
-                response_object = {
-                    'status':'fail',
-                    'message':'You are not authorized to perform this operation.Admin only.'
-                }
-                return response_object
 
+        
         
 @student_namespace.route('/students/course/<int:student_id>')
 class GetStudentC(Resource):
@@ -242,27 +232,23 @@ class GetMatricNo(Resource):
         Generate Student Matric Number(Admin)
         """
         data = student_namespace.payload
+        user_id = get_jwt_identity()
 
-        email = get_jwt_identity()
-        users = User.query.all()
-        for user in users :
-            if user.email == email and user.designation.upper() == 'ADMIN':
-                new_matric = StudentMatricNo(
-                student_id = data['student_id'],
-                email = data['email'],
-                matric_no = "ALT/2023/STUDENT/" + str(data['student_id'])
-                )
-            
-                new_matric.save()
-                
-                return new_matric, HTTPStatus.CREATED
+        user = User.get_by_id(user_id)
+        if user.designation.upper() != "ADMIN":
+            abort(401,desription='You are not authorized to perform this operation.Admin only.') 
+        
 
-            else:
-                response_object = {
-                    'status':'fail',
-                    'message':'You are not authorized to perform this operation.Admin only.'
-                }
-                return response_object
+        new_matric = StudentMatricNo(
+        student_id = data['student_id'],
+        email = data['email'],
+        matric_no = "ALT/2023/STUDENT/" + str(data['student_id'])
+        )
+    
+        new_matric.save()
+        
+        return new_matric, HTTPStatus.CREATED
+
         
 @student_namespace.route('/students/matric/<int:user_id>')
 class GetMatricNumber(Resource):
@@ -276,7 +262,12 @@ class GetMatricNumber(Resource):
         """
         Get Student Matriculation Number(Student)
         """
-        email = get_jwt_identity()
+        user_id = get_jwt_identity()
+
+        user = User.get_by_id(user_id)
+        if user.designation.upper() != "STUDENT":
+            abort(401,desription='You are not authorized to perform this operation.Student only.') 
+        
 
         matrics = StudentMatricNo.query.all()
 

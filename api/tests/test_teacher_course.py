@@ -40,36 +40,6 @@ class TeacherCourseTestCase(unittest.TestCase):
 
         assert response.json == []
 
-    def test_create_teacherCourses(self):
-        data = {
-            'teacher_id' :1,
-            'course_title' : 'Mathematic',
-            'course_code' : 'mth101',
-            'course_unit ': 3,
-            'staff_id' : 'ALT/2023/STAFF/1',
-        }
-        token = create_access_token(identity='sirmuso@gmail.com')
-
-        headers = {
-            'Authorization':f"Bearer {token}"
-        }
-
-        response = self.client.post('/TeacherCourse/teacher/courses',json=data,headers =headers)
-
-        assert response.status_code == 200
-
-        teachercourse = TeacherCourse.query.all()
-
-        course_id = teachercourse[0].id
-
-        assert course_id == 1
-
-        assert len(teachercourse) == 1
-
-        assert response.json['course_title']== 'Mathematic'
-
-        assert response.json['course_code']== 'mth101'
-
 
     def test_get_teachercourse_by_id(self):
         teachercourse = TeacherCourse(

@@ -1,4 +1,4 @@
-from flask_restx import Namespace,Resource,fields
+from flask_restx import Namespace,Resource,fields,abort
 from ..models.grade import Grade
 from ..models.users import User
 from ..teacher_course.views import display_course
@@ -99,31 +99,27 @@ class SubmitGetScores(Resource):
         else:
             grade_point = 0
 
-        email = get_jwt_identity()
-        users = User.query.all()
-        for user in users :
-            if user.email == email and user.designation.upper() == 'ADMIN' or user.designation.upper() == 'TEACHER' :
-                new_grade = Grade( 
-                    course_id = data['course_id'],
-                    email = data['email'],
-                    student_id = data['student_id'],
-                    level = data['level'],
-                    matric_no = data['matric_no'],
-                    score = data['score'],
-                    course_unit = data['course_unit'],
-                    grade = grade,
-                    grade_point = grade_point
+        user_id = get_jwt_identity()
 
-                )
-                new_grade.save()
-                
-                return new_grade, HTTPStatus.CREATED
-            else:
-                response_object = {
-                    'status':'fail',
-                    'message':'You are not authorized to perform this operation.Admin only.'
-                }
-                return response_object
+        user = User.get_by_id(user_id)
+        if user.designation.upper() == "STUDENT":
+            abort(401,desription='You are not authorized to perform this operation.Admin & Teacher only.')
+        new_grade = Grade( 
+            course_id = data['course_id'],
+            email = data['email'],
+            student_id = data['student_id'],
+            level = data['level'],
+            matric_no = data['matric_no'],
+            score = data['score'],
+            course_unit = data['course_unit'],
+            grade = grade,
+            grade_point = grade_point
+
+        )
+        new_grade.save()
+        
+        return new_grade, HTTPStatus.CREATED
+            
 
 
         
@@ -180,27 +176,22 @@ class GetUpdateDeleteScores(Resource):
         else:
             grade_point = 0
         
-        email = get_jwt_identity()
-        users = User.query.all()
-        for user in users :
-            if user.email == email and user.designation.upper() == 'ADMIN' or user.designation.upper() == 'TEACHER' :
-                grade_update.email = data['email'],
-                grade_update.student_id = data['student_id'],
-                grade_update.course_unit = data['course_unit'],
-                grade_update.level = data['level'],
-                grade_update.matric_no = data['matric_no'],
-                grade_update.score = data['score'],
-                grade_update.grade = grade,
-                grade_update.grade_point = grade_point
-                grade_update.update()
-                
-                return grade_update,HTTPStatus.OK
-            else:
-                response_object = {
-                    'status':'fail',
-                    'message':'You are not authorized to perform this operation.Admin only.'
-                }
-                return response_object
+        user_id = get_jwt_identity()
+
+        user = User.get_by_id(user_id)
+        if user.designation.upper() == "STUDENT":
+            abort(401,desription='You are not authorized to perform this operation.Admin & Teacher only.')
+        grade_update.email = data['email'],
+        grade_update.student_id = data['student_id'],
+        grade_update.course_unit = data['course_unit'],
+        grade_update.level = data['level'],
+        grade_update.matric_no = data['matric_no'],
+        grade_update.score = data['score'],
+        grade_update.grade = grade,
+        grade_update.grade_point = grade_point
+        grade_update.update()
+        
+        return grade_update,HTTPStatus.OK
 
         
     
@@ -212,20 +203,15 @@ class GetUpdateDeleteScores(Resource):
         """
         grade_delete = Grade.get_by_id(course_id)
 
-        email = get_jwt_identity()
-        users = User.query.all()
-        for user in users :
-            if user.email == email and user.designation.upper() == 'ADMIN' or user.designation.upper() == 'TEACHER' :
-                grade_delete.delete()
+        user_id = get_jwt_identity()
 
-                return {"message":f"Grade with id {course_id} Delected Successfully"},HTTPStatus.OK
+        user = User.get_by_id(user_id)
+        if user.designation.upper() == "STUDENT":
+            abort(401,desription='You are not authorized to perform this operation.Admin & Teacher only.')
+        grade_delete.delete()
 
-            else:
-                response_object = {
-                    'status':'fail',
-                    'message':'You are not authorized to perform this operation.Admin only.'
-                }
-                return response_object
+        return {"message":f"Grade with id {course_id} Delected Successfully"},HTTPStatus.OK
+
 
 
        

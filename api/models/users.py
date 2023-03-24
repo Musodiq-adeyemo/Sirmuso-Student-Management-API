@@ -16,7 +16,7 @@ class User(db.Model):
     email = db.Column(db.String(200), unique=True,nullable=False)
     username = db.Column(db.String(100),unique=True,nullable=False)
     password = db.Column(db.String(100),nullable=False)
-    designation =db.Column(db.Enum(Roles),default=Roles.STUDENT)
+    designation =db.Column(db.String(50),nullable=False)
     profile = db.relationship("Profile", back_populates="user")
     student = db.relationship("Student", back_populates="user")
     teacher = db.relationship("Teacher", back_populates="user")

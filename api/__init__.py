@@ -34,6 +34,7 @@ def create_app(config=config_dict['dev']):
     migrate = Migrate(app,db)
 
     
+    
     @jwt.expired_token_loader
     def expired_token_callback(jwt_header, jwt_payload):
         return {
