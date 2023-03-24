@@ -29,13 +29,9 @@ display_student = student_namespace.model(
 )
 
 
-<<<<<<< HEAD
-student_matricNo = student_namespace.model(
-    'StudentMatricNO', {
-=======
+
 matricNo = student_namespace.model(
     'Matric', {
->>>>>>> e1e8c965db80292e5c4638b005e67ab20d97152d
        'student_id':fields.Integer(description='Student  ID',required = True),
        'email':fields.String(description='Student Email',required = True),
        'user_id':fields.Integer(description='Student ID',required = True),
